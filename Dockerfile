@@ -1,44 +1,52 @@
-FROM ubuntu
-MAINTAINER Joshua Lund
+FROM debian:stable
+MAINTAINER Tom Parys "tom.parys@gmail.com"
 
 # Tell debconf to run in non-interactive mode
 ENV DEBIAN_FRONTEND noninteractive
 
+# Setup multiarch because Skype is 32bit only
+RUN dpkg --add-architecture i386
+
 # Make sure the repository information is up to date
 RUN apt-get update
 
-# Install Chrome dependencies
-RUN apt-get install -y gconf-service libasound2 libatk1.0-0 libcairo2 libcap2 libcups2 libcurl3 libfontconfig1 libgdk-pixbuf2.0-0 libgtk2.0-0 libnspr4 libnss3 libpango1.0-0 librtmp0 libxss1 libxtst6 xdg-utils
 
-# Install Chrome
-RUN apt-get install -y ca-certificates wget
-RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -P /tmp/
-RUN dpkg -i /tmp/google-chrome-stable_current_amd64.deb
+# Install PulseAudio for i386 (64bit version does not work with Skype)
+RUN apt-get install -y libpulse0:i386 pulseaudio:i386
 
-# Install OpenSSH
-RUN apt-get install -y openssh-server
+# We need ssh to access the docker container, wget to download skype
+RUN apt-get install -y openssh-server wget 
 
-# Create OpenSSH privilege separation directory
-RUN mkdir /var/run/sshd
+# Install Skype
+RUN wget http://download.skype.com/linux/skype-debian_4.2.0.13-1_i386.deb -O /usr/src/skype.deb
+RUN dpkg -i /usr/src/skype.deb || true
+RUN apt-get install -fy						# Automatically detect and install dependencies
 
-# Install Pulseaudio
-RUN apt-get install -y pulseaudio
 
-# Add the Chrome user that will run the browser
-RUN adduser --disabled-password --gecos "Chrome User" --uid 5001 chrome
+# Create a user
+RUN useradd -m -d /home/docker -p `perl -e 'print crypt('"docker"', "aa"),"\n"'` docker
 
-# Add SSH public key for the chrome user
-RUN mkdir /home/chrome/.ssh
-ADD id_rsa.pub /home/chrome/.ssh/authorized_keys
-RUN chown -R chrome:chrome /home/chrome/.ssh
+# Create OpenSSH privilege separation directory, enable X11Forwarding
+RUN mkdir -p /var/run/sshd
+RUN echo X11Forwarding yes >> /etc/ssh/ssh_config
 
-# Set up the launch wrapper
-RUN echo 'export PULSE_SERVER="tcp:localhost:64713"' >> /usr/local/bin/chrome-pulseaudio-forward
-RUN echo 'google-chrome --no-sandbox' >> /usr/local/bin/chrome-pulseaudio-forward
-RUN chmod 755 /usr/local/bin/chrome-pulseaudio-forward
+# Add SSH public key for the docker user
+RUN mkdir /home/docker/.ssh
+RUN chown -R docker:docker /home/docker/.ssh
+ADD id_rsa.pub /home/docker/.ssh/authorized_keys
 
-# Start SSH so we are ready to make a tunnel
-ENTRYPOINT ["/usr/sbin/sshd",  "-D"]
+# Set locale (fix locale warnings)
+RUN localedef -v -c -i en_US -f UTF-8 en_US.UTF-8 || true
+RUN echo "Europe/Prague" > /etc/timezone
+
+# Set up the launch wrapper - sets up PulseAudio to work correctly
+RUN echo 'export PULSE_SERVER="tcp:localhost:64713"' >> /usr/local/bin/skype-pulseaudio
+RUN echo 'PULSE_LATENCY_MSEC=60 skype' >> /usr/local/bin/skype-pulseaudio
+RUN chmod 755 /usr/local/bin/skype-pulseaudio
+
 
 # Expose the SSH port
 EXPOSE 22
+
+# Start SSH
+ENTRYPOINT ["/usr/sbin/sshd",  "-D"]
