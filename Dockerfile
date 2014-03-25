@@ -45,10 +45,9 @@ RUN useradd -m -d /home/docker -p `perl -e 'print crypt('"docker"', "aa"),"\n"'`
 RUN mkdir -p /var/run/sshd
 RUN echo X11Forwarding yes >> /etc/ssh/ssh_config
 
-# Add SSH public key for the docker user
+# Prepare ssh config folder so we can upload SSH public key later
 RUN mkdir /home/docker/.ssh
 RUN chown -R docker:docker /home/docker/.ssh
-ADD id_rsa.pub /home/docker/.ssh/authorized_keys
 
 # Set locale (fix locale warnings)
 RUN localedef -v -c -i en_US -f UTF-8 en_US.UTF-8 || true

@@ -34,19 +34,11 @@ Instructions
 
         git clone https://github.com/tomparys/docker-skype-pulseaudio.git && cd docker-skype-pulseaudio
 
-6. (Optional) Copy your SSH public key into place
-
-        cp ~/.ssh/id_rsa.pub .
-        
-    If your key file has a different filename, rename the copy to `id_rsa.pub` in this folder, it will work.
-   
-    I recommend creating a second SSH key without a password for this.
-
-7. Build the container
+6. Build the container
 
         sudo docker build -t skype .
 
-8. Create an entry in your .ssh/config file for easy access. It should look like this:
+7. Create an entry in your .ssh/config file for easy access. It should look like this:
         
         Host docker-skype
           User      docker
@@ -55,19 +47,26 @@ Instructions
           RemoteForward 64713 localhost:4713
           ForwardX11 yes
           
-    In case you used a non-standard filename of your SSH key, add this:
+    (Optional) I recommend creating an SSH key without a password to be used to connect to this container.
+    So in case you used a non-standard filename for your SSH key, add this:
    
           IdentityFile /path/to/your/ssh/key
 
-9. Run the container and forward the appropriate port
+8. Run the container and forward the appropriate port
 
         sudo docker run -d -p 55555:22 skype
+
+9. (Optional) Copy an SSH public key
+
+    If you plan to use an SSH key, copy the public key to the docker container using the following command. The password is `docker`.
+
+        ssh-copy-id -i /path/to/your/public/key.pub docker-skype
 
 10. Connect via SSH and launch Skype using the provided PulseAudio wrapper script
 
         ssh docker-skype skype-pulseaudio
      
-    In case you didn't copy your SSH public key, the password is `docker`.
+    In case you didn't copy the SSH public key, the password is `docker`.
 
 11. Go use Skype in a safe container!
 
