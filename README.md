@@ -67,7 +67,7 @@ Instructions
 
         ssh docker-skype skype-pulseaudio
 
-11. Go use Skype!
+11. Go use Skype in a safe container!
 
 
 Frequently Asked Questions

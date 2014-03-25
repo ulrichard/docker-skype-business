@@ -1,5 +1,19 @@
+# ┌────────────────────────────────────────────────────────────────────┐
+# │ Docker Skype Pulseaudio                                            │
+# ├────────────────────────────────────────────────────────────────────┤
+# │ Copyright @ 2014 Tom Parys                                         │
+# │                                                                    │
+# │ Licensed under the MIT License                                     │
+# ├────────────────────────────────────────────────────────────────────┤
+# │ Parts of code:                                                     │
+# │                                                                    │
+# │ Copyright © 2014 Jordan Schatz                                     │
+# │ Copyright © 2014 Noionλabs (http://noionlabs.com)                  │
+# │ Licensed under the MIT License                                     │
+# └────────────────────────────────────────────────────────────────────┘
+
 FROM debian:stable
-MAINTAINER Tom Parys "tom.parys@gmail.com"
+MAINTAINER Tom Parys "tom.parys+copyright@gmail.com"
 
 # Tell debconf to run in non-interactive mode
 ENV DEBIAN_FRONTEND noninteractive
