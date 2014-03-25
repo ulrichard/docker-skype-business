@@ -66,6 +66,8 @@ Instructions
 10. Connect via SSH and launch Skype using the provided PulseAudio wrapper script
 
         ssh docker-skype skype-pulseaudio
+     
+    In case you didn't copy your SSH public key, the password is `docker`.
 
 11. Go use Skype in a safe container!
 
