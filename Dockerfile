@@ -32,6 +32,7 @@ RUN echo X11Forwarding yes >> /etc/ssh/ssh_config
 
 # Prepare ssh config folder so we can upload SSH public key later
 RUN mkdir /home/docker/.ssh
+RUN chown -R docker:docker /home/docker
 RUN chown -R docker:docker /home/docker/.ssh
 
 # Set locale (fix locale warnings)
