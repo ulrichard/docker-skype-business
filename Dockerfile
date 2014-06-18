@@ -18,7 +18,7 @@ RUN apt-get install -y libpulse0:i386 pulseaudio:i386
 RUN apt-get install -y openssh-server wget 
 
 # Install Skype
-RUN wget http://download.skype.com/linux/skype-debian_4.2.0.13-1_i386.deb -O /usr/src/skype.deb
+RUN wget http://download.skype.com/linux/skype-debian_4.3.0.37-1_i386.deb -O /usr/src/skype.deb
 RUN dpkg -i /usr/src/skype.deb || true
 RUN apt-get install -fy						# Automatically detect and install dependencies
 
