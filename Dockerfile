@@ -23,8 +23,9 @@ RUN dpkg -i /usr/src/skype.deb || true
 RUN apt-get install -fy						# Automatically detect and install dependencies
 
 
-# Create a user
-RUN useradd -m -d /home/docker -p `perl -e 'print crypt('"docker"', "aa"),"\n"'` docker
+# Create user "docker" and set the password to "docker"
+RUN useradd -m -d /home/docker docker
+RUN echo "docker:docker" | chpasswd
 
 # Create OpenSSH privilege separation directory, enable X11Forwarding
 RUN mkdir -p /var/run/sshd
