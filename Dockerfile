@@ -9,11 +9,14 @@ ENV DEBIAN_FRONTEND noninteractive
 # Setup multiarch because Skype is 32bit only
 #RUN dpkg --add-architecture i386
 
+# Make sure the repository information is up to date
+RUN apt-get update
+
 # Ensure APT works with HTTPS and up-to-date CA certificates are installed
 RUN apt-get install -y apt-transport-https ca-certificates
 
 # Add appropriate TEL.RED repository to APT sources list
-RUN sudo sh -c 'echo deb https://tel.red/repos/debian jessie non-free > /etc/apt/sources.list.d/telred.list'
+RUN sh -c 'echo deb https://tel.red/repos/debian jessie non-free > /etc/apt/sources.list.d/telred.list'
 
 # Download and register TEL.RED software signing public key:
 RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 9454C19A66B920C83DDF696E07C8CCAFCE49F8C5
