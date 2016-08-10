@@ -1,27 +1,31 @@
 FROM debian:stable
-MAINTAINER Tom Parys "tom.parys+copyright@gmail.com"
+MAINTAINER Richard Ulrich   "richi@ulrichard.ch"
+
+# install instructions for sky can be found here: https://tel.red/repos.htm
 
 # Tell debconf to run in non-interactive mode
 ENV DEBIAN_FRONTEND noninteractive
 
 # Setup multiarch because Skype is 32bit only
-RUN dpkg --add-architecture i386
+#RUN dpkg --add-architecture i386
+
+# Ensure APT works with HTTPS and up-to-date CA certificates are installed
+RUN apt-get install -y apt-transport-https ca-certificates
+
+# Add appropriate TEL.RED repository to APT sources list
+RUN sudo sh -c 'echo deb https://tel.red/repos/debian jessie non-free > /etc/apt/sources.list.d/telred.list'
+
+# Download and register TEL.RED software signing public key:
+RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 9454C19A66B920C83DDF696E07C8CCAFCE49F8C5
 
 # Make sure the repository information is up to date
 RUN apt-get update
 
-
 # Install PulseAudio for i386 (64bit version does not work with Skype)
-RUN apt-get install -y libpulse0:i386 pulseaudio:i386
+#RUN apt-get install -y libpulse0:i386 pulseaudio:i386
 
 # We need ssh to access the docker container, wget to download skype
-RUN apt-get install -y openssh-server wget 
-
-# Install Skype
-RUN wget http://download.skype.com/linux/skype-debian_4.3.0.37-1_i386.deb -O /usr/src/skype.deb
-RUN dpkg -i /usr/src/skype.deb || true
-RUN apt-get install -fy						# Automatically detect and install dependencies
-
+RUN apt-get install -y openssh-server wget sky
 
 # Create user "docker" and set the password to "docker"
 RUN useradd -m -d /home/docker docker
@@ -41,9 +45,9 @@ RUN localedef -v -c -i en_US -f UTF-8 en_US.UTF-8 || true
 RUN echo "Europe/Prague" > /etc/timezone
 
 # Set up the launch wrapper - sets up PulseAudio to work correctly
-RUN echo 'export PULSE_SERVER="tcp:localhost:64713"' >> /usr/local/bin/skype-pulseaudio
-RUN echo 'PULSE_LATENCY_MSEC=60 skype' >> /usr/local/bin/skype-pulseaudio
-RUN chmod 755 /usr/local/bin/skype-pulseaudio
+#RUN echo 'export PULSE_SERVER="tcp:localhost:64713"' >> /usr/local/bin/skype-pulseaudio
+#RUN echo 'PULSE_LATENCY_MSEC=60 skype' >> /usr/local/bin/skype-pulseaudio
+#RUN chmod 755 /usr/local/bin/skype-pulseaudio
 
 
 # Expose the SSH port
